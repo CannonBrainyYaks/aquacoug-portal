@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#681d34"><title>AquaCoug Training Check-In</title><link rel="stylesheet" href="styles.css">
+<style>
+.checkin-wrap{width:min(740px,calc(100% - 32px));margin:42px auto 72px}.checkin-card{border:1px solid #e7dfe2;border-top:5px solid #681d34;border-radius:12px;padding:clamp(20px,4vw,38px);box-shadow:0 10px 30px #35111e0a}.checkin-card h1{line-height:1.12;font-size:clamp(30px,5vw,42px);margin:8px 0 14px}.intro{color:#56484e}.field{margin:24px 0}.field label,.field legend{display:block;font-weight:750;margin-bottom:10px}.field input[type=text],.field textarea,.field input[type=email]{width:100%;border:1px solid #cbbfc4;border-radius:6px;padding:13px;font:inherit}.field textarea{min-height:110px;resize:vertical}.field fieldset{border:0;padding:0;margin:0}.choices{display:grid;gap:8px}.choices label{display:flex;align-items:center;gap:11px;border:1px solid #e7dfe2;border-radius:6px;padding:12px;font-weight:500;cursor:pointer}.choices input{accent-color:#681d34;width:18px;height:18px}.info-bar{background:#f7f4f5;border-radius:8px;padding:17px;margin:22px 0}.info-bar strong{display:block;color:#681d34}.actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.actions button{font:inherit;border:0;cursor:pointer}.status{font-weight:650;min-height:24px}.status.error{color:#a31f2b}.status.success{color:#166534}.hide{display:none}.back-link{display:inline-block;margin:24px 0;color:#681d34;font-weight:700;text-decoration:none}.tiny{font-size:13px;color:#685d62}.coach-link{border:0;background:none;color:#681d34;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px;padding:0}
+</style></head><body>
+<header><div class="wrap top"><div class="identity"><img src="assets/images/logos/aquacoug-logo.jpg" alt="AquaCoug logo"><div><strong>AQUACOUG SWIMMING</strong><small>CANNON SCHOOL · 2026–27</small></div></div><nav><a href="index.html">Home</a><a href="calendar.html">Calendar</a><a href="roster.html">Roster</a></nav></div></header>
+<main class="checkin-wrap"><a class="back-link" href="index.html">← Back to AquaCoug Portal</a>
+<section class="checkin-card"><p class="eyebrow">THANKSGIVING WEEK · NOVEMBER 23–24</p><h1>Training Check-In</h1><p class="intro">We know some of you will be away over Thanksgiving break, and that's fine! Please let us know which practices you'll attend and how you'll keep moving if you're out of town. We don't need to know where you're going.</p>
+<div class="info-bar"><strong>Optional team practices</strong>Monday, Nov. 23 & Tuesday, Nov. 24<br>7:00–8:00 AM · West Cabarrus YMCA</div>
+<form id="checkin">
+<div class="field"><label for="swimmer">Your name *</label><input id="swimmer" type="text" autocomplete="name" maxlength="100" required placeholder="First and last name"></div>
+<div class="field"><fieldset><legend>Monday, November 23 *</legend><div class="choices"><label><input type="radio" name="monday" value="attending" required> I'll be at practice</label><label><input type="radio" name="monday" value="away"> I'll be away / unable to attend</label><label><input type="radio" name="monday" value="unsure"> Not sure yet</label></div></fieldset></div>
+<div class="field"><fieldset><legend>Tuesday, November 24 *</legend><div class="choices"><label><input type="radio" name="tuesday" value="attending" required> I'll be at practice</label><label><input type="radio" name="tuesday" value="away"> I'll be away / unable to attend</label><label><input type="radio" name="tuesday" value="unsure"> Not sure yet</label></div></fieldset></div>
+<div id="away-fields" class="hide"><div class="field"><fieldset><legend>How will you keep training while you're away? (Select all that apply)</legend><div class="choices">
+<label><input type="checkbox" name="activity" value="Swimming"> Swimming on my own</label>
+<label><input type="checkbox" name="activity" value="Running"> Running</label>
+<label><input type="checkbox" name="activity" value="Strength training"> Weightlifting / strength training</label>
+<label><input type="checkbox" name="activity" value="Other cardio"> Biking, hiking, or other cardio</label>
+<label><input type="checkbox" name="activity" value="Dryland"> Dryland / bodyweight exercises</label>
+<label><input type="checkbox" name="activity" value="Other"> Other</label></div></fieldset></div>
+<div class="field"><label for="plan">What's your plan for keeping active? *</label><textarea id="plan" maxlength="1500" placeholder="A little detail is all we need — what are you planning to do?"></textarea></div></div>
+<div class="actions"><button class="btn" type="submit" id="submit">Send Check-In</button><span class="status" id="status" role="status" aria-live="polite"></span></div>
+<p class="tiny">Please submit once. If your plans change, let Coach Northrup or Coach Taylor know.</p></form>
+</section><p class="tiny" style="text-align:center;margin-top:28px">Coaching staff: <a href="training-checkin-coaches.html">view check-in responses</a></p></main>
+<footer><div class="wrap foot"><span>AQUACOUG SWIMMING · CANNON SCHOOL</span><strong>Go AquaCougs!</strong><span>AquaCoug Coaching Staff</span></div></footer>
+<script>
+const url='https://zsduepkuqukltjmvqjyi.supabase.co/rest/v1/aquacoug_training_checkins';
+const key='sb_publishable_hC1Om-qG7Crbohs3ShliyQ_xWzxSP2y';
+const form=document.querySelector('#checkin'),away=document.querySelector('#away-fields'),plan=document.querySelector('#plan'),status=document.querySelector('#status'),submit=document.querySelector('#submit');
+function update(){const m=form.elements.monday.value,t=form.elements.tuesday.value;const show=(m&&m!=='attending')||(t&&t!=='attending');away.classList.toggle('hide',!show);plan.required=!!show}
+form.addEventListener('change',update);
+form.addEventListener('submit',async e=>{e.preventDefault();status.textContent='Sending…';status.className='status';submit.disabled=true;
+const data={week_start:'2026-11-23',swimmer_name:document.querySelector('#swimmer').value.trim(),monday_status:form.elements.monday.value,tuesday_status:form.elements.tuesday.value,activities:[...form.querySelectorAll('[name=activity]:checked')].map(x=>x.value),training_plan:away.classList.contains('hide')?'':plan.value.trim()};
+if((data.monday_status!=='attending'||data.tuesday_status!=='attending')&&data.training_plan.length<8){status.textContent='Please add a little detail about your training plan.';status.classList.add('error');submit.disabled=false;return;}
+try{const r=await fetch(url,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)});if(!r.ok)throw Error('Save failed');form.reset();update();status.textContent='Thanks! Your check-in was saved.';status.classList.add('success')}catch(err){status.textContent='Could not save. Please try again or tell a coach.';status.classList.add('error')}finally{submit.disabled=false}});
+</script></body></html>
