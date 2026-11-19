@@ -11,14 +11,14 @@
 <div class="field"><label for="swimmer">Your name *</label><input id="swimmer" type="text" autocomplete="name" maxlength="100" required placeholder="First and last name"></div>
 <div class="field"><fieldset><legend>Monday, November 23 *</legend><div class="choices"><label><input type="radio" name="monday" value="attending" required> I'll be at practice</label><label><input type="radio" name="monday" value="away"> I'll be on vacation</label><label><input type="radio" name="monday" value="not_attending"> I won't be attending</label><label><input type="radio" name="monday" value="unsure"> Not sure yet</label></div></fieldset></div>
 <div class="field"><fieldset><legend>Tuesday, November 24 *</legend><div class="choices"><label><input type="radio" name="tuesday" value="attending" required> I'll be at practice</label><label><input type="radio" name="tuesday" value="away"> I'll be on vacation</label><label><input type="radio" name="tuesday" value="not_attending"> I won't be attending</label><label><input type="radio" name="tuesday" value="unsure"> Not sure yet</label></div></fieldset></div>
-<div id="away-fields" class="hide"><div class="field"><fieldset><legend>If you aren't attending one or both practices, how will you keep training? (Select all that apply)</legend><div class="choices">
+<div id="away-fields"><div class="info-bar"><strong>Training while away from practice</strong>If you are missing either morning, please complete this section. If you are attending both, you can skip it.</div><div class="field"><fieldset><legend>If you aren't attending one or both practices, how will you keep training? (Select all that apply)</legend><div class="choices">
 <label><input type="checkbox" name="activity" value="Swimming"> Swimming on my own</label>
 <label><input type="checkbox" name="activity" value="Running"> Running</label>
 <label><input type="checkbox" name="activity" value="Strength training"> Weightlifting / strength training</label>
 <label><input type="checkbox" name="activity" value="Other cardio"> Biking, hiking, or other cardio</label>
 <label><input type="checkbox" name="activity" value="Dryland"> Dryland / bodyweight exercises</label>
 <label><input type="checkbox" name="activity" value="Other"> Other</label></div></fieldset></div>
-<div class="field"><label for="plan">Tell us what you'll be doing to stay in shape while missing practice *</label><textarea id="plan" maxlength="1500" placeholder="Running, swimming, lifting, dryland, or something else — tell us your plan."></textarea></div></div>
+<div class="field"><label for="plan">Tell us what you'll be doing to stay in shape while missing practice (required if missing practice)</label><textarea id="plan" maxlength="1500" placeholder="Running, swimming, lifting, dryland, or something else — tell us your plan."></textarea></div></div>
 <div class="actions"><button class="btn" type="submit" id="submit">Send Check-In</button><span class="status" id="status" role="status" aria-live="polite"></span></div>
 <p class="tiny">Please submit once. If your plans change, let Coach Northrup or Coach Taylor know.</p></form>
 </section><p class="tiny" style="text-align:center;margin-top:28px">Coaching staff: <a href="training-checkin-coaches.html">view check-in responses</a></p></main>
@@ -27,10 +27,10 @@
 const url='https://zsduepkuqukltjmvqjyi.supabase.co/rest/v1/aquacoug_training_checkins';
 const key='sb_publishable_hC1Om-qG7Crbohs3ShliyQ_xWzxSP2y';
 const form=document.querySelector('#checkin'),away=document.querySelector('#away-fields'),plan=document.querySelector('#plan'),status=document.querySelector('#status'),submit=document.querySelector('#submit');
-function update(){const m=form.elements.monday.value,t=form.elements.tuesday.value;const show=(m&&m!=='attending')||(t&&t!=='attending');away.classList.toggle('hide',!show);plan.required=!!show}
+function update(){const m=form.elements.monday.value,t=form.elements.tuesday.value;plan.required=!!((m&&m!=='attending')||(t&&t!=='attending'))}
 form.addEventListener('change',update);
 form.addEventListener('submit',async e=>{e.preventDefault();status.textContent='Sending…';status.className='status';submit.disabled=true;
-const data={week_start:'2026-11-23',swimmer_name:document.querySelector('#swimmer').value.trim(),monday_status:form.elements.monday.value,tuesday_status:form.elements.tuesday.value,activities:[...form.querySelectorAll('[name=activity]:checked')].map(x=>x.value),training_plan:away.classList.contains('hide')?'':plan.value.trim()};
+const data={week_start:'2026-11-23',swimmer_name:document.querySelector('#swimmer').value.trim(),monday_status:form.elements.monday.value,tuesday_status:form.elements.tuesday.value,activities:[...form.querySelectorAll('[name=activity]:checked')].map(x=>x.value),training_plan:plan.value.trim()};
 if((data.monday_status!=='attending'||data.tuesday_status!=='attending')&&data.training_plan.length<8){status.textContent='Please add a little detail about your training plan.';status.classList.add('error');submit.disabled=false;return;}
 try{const r=await fetch(url,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(data)});if(!r.ok)throw Error('Save failed');form.reset();update();status.textContent='Thanks! Your check-in was saved.';status.classList.add('success')}catch(err){status.textContent='Could not save. Please try again or tell a coach.';status.classList.add('error')}finally{submit.disabled=false}});
 </script></body></html>
